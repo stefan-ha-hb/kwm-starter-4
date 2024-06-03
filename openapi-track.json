@@ -1,0 +1,158 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Track API",
+    "description": "API for retrieving tracks"
+  },
+  "servers": [
+    {
+      "url": "https://kwm24-api.vercel.app/",
+      "description": "Main server"
+    }
+  ],
+  "paths": {
+    "/api/tracks": {
+      "get": {
+        "summary": "Get tracks",
+        "description": "Get a list of tracks with optional filtering",
+        "parameters": [
+          {
+            "name": "artist",
+            "in": "query",
+            "description": "Filter tracks by artist",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "description": "Filter tracks by title",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "genres",
+            "in": "query",
+            "description": "Filter tracks by genres (comma-separated)",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Track"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tracks/{id}": {
+      "get": {
+        "summary": "Get track by ID",
+        "description": "Get details of a track by its ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the track",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackWithSrc"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Track not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Track": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["podcast", "song", "audiobook"]
+          },
+          "artist": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "number"
+          },
+          "releaseDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "coverUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "TrackWithSrc": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Track"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "src": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

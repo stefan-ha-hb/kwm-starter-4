@@ -1,0 +1,19 @@
+.audio-player {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  top: auto;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-top-width: 1px;
+  border-color: #d1d5db;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+  transform: translateY(100%);
+  background-color: #fff;
+
+  &.is-shown {
+    transform: translateY(0);
+  }
+}
