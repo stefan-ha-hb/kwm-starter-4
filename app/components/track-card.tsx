@@ -1,15 +1,28 @@
 import { Pause, Play } from 'lucide-react';
 import { Track } from '~/models/track';
+import { pauseAction, playAction } from '~/store.client/player-reducer';
+import { useAppDispatch, useAppSelector } from '~/store.client/store';
 
 type TrackCardInput = {
   track: Track;
 };
 
 export function TrackCard({ track }: TrackCardInput) {
-  const isPlaying = false;
+  const dispatch = useAppDispatch();
+  const currentPlayingTrackId = useAppSelector((state) => {
+    return state.player.trackId;
+  });
+  const trackState = useAppSelector((state) => {
+    return state.player.trackState;
+  });
+  const isPlaying = track.id === currentPlayingTrackId && trackState === 'playing';
 
   const onPlayButtonClicked = () => {
-    console.log('clicked play button');
+    if (isPlaying) {
+      dispatch(pauseAction());
+    } else {
+      dispatch(playAction({ trackId: track.id }));
+    }
   };
 
   return (

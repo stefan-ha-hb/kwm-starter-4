@@ -5,22 +5,22 @@ import { useLocalStorage } from 'usehooks-ts';
 import { loader } from '~/routes/app';
 
 export function Sidebar() {
-  const [isExpanded, setIsExpanded] = useLocalStorage('sidebar', true, { initializeWithValue: false });
-  const handleExpandToggle = () => setIsExpanded(!isExpanded);
+  // const [isExpanded, setIsExpanded] = useLocalStorage('sidebar', true, { initializeWithValue: false });
+  // const handleExpandToggle = () => setIsExpanded(!isExpanded);
 
-  //   const { sidebarExpanded } = useLoaderData<typeof loader>();
-  //   const isExpanded = sidebarExpanded;
+    const { sidebarExpanded } = useLoaderData<typeof loader>();
+    const isExpanded = sidebarExpanded;
 
-  //   const submit = useSubmit();
-  //   const handleExpandToggle = () => {
-  //     submit(
-  //       // This submits to the app action
-  //       {
-  //         sidebarExpanded: !sidebarExpanded,
-  //       },
-  //       { method: 'POST' }
-  //     );
-  //   };
+    const submit = useSubmit();
+    const handleExpandToggle = () => {
+      submit(
+        // This submits to the app action
+        {
+          sidebarExpanded: !sidebarExpanded,
+        },
+        { method: 'POST' }
+      );
+    };
 
   return (
     <div className="sidebar" aria-expanded={isExpanded}>

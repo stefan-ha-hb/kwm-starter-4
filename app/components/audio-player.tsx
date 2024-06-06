@@ -1,19 +1,50 @@
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import VolumeButton from './volume-button';
 import Audio from './audio';
+import { useAppDispatch, useAppSelector } from '~/store.client/store';
+import { pauseAction, playAction, stopAction } from '~/store.client/player-reducer';
+import { useQuery } from '@tanstack/react-query';
+import { fetchTrackById } from '~/apis/track-api';
+import { useLocalStorage } from 'usehooks-ts';
 
 export function AudioPlayer() {
-  const showPlayer = false;
-  const isCurrentlyPlaying = false;
-  const audioSrc = null;
+  const [isMute] = useLocalStorage('volume', false)
+  const currentTrackState = useAppSelector((state) => state.player.trackState);
+  const isCurrentlyPlaying = currentTrackState === 'playing';
+  const currentTrackId = useAppSelector((state) => state.player.trackId);
+  const dispatch = useAppDispatch();
+
+  const onPlaybackEndedHandler = () => {
+    dispatch(stopAction())
+  }
+
+  const showPlayer = currentTrackState !== 'idle';
+
+  const { data } = useQuery({
+    queryKey: ['tracks', currentTrackId],
+    queryFn: () => {
+      if (currentTrackId) {
+        return fetchTrackById(currentTrackId);
+      }
+      return null;
+    },
+    enabled: currentTrackId !== null,
+  });
+
+  const audioSrc = data?.src;
 
   const handlePlayClick = () => {
-    console.log('clicked play button');
+    if (isCurrentlyPlaying) {
+      dispatch(pauseAction());
+    } else {
+      dispatch(playAction({ trackId: currentTrackId }));
+    }
   };
 
   return (
     <>
       <section className={`audio-player ${showPlayer ? 'is-shown' : ''}`}>
+        {currentTrackState}
         <div className="mx-auto max-w-4xl w-full">
           <div className="flex gap-8 items-center">
             <div className="flex gap-3">
@@ -29,9 +60,8 @@ export function AudioPlayer() {
             </div>
 
             <div className="flex-none w-52 min-h-11">
-              {/* TODO add artist & track title from api */}
-              <div className="text-sm text-muted-foreground">Artist placeholder</div>
-              <div>Track placeholder</div>
+              <div className="text-sm text-muted-foreground">{data?.artist}</div>
+              <div>{data?.title}</div>
             </div>
 
             <div className="flex-auto">
@@ -46,7 +76,7 @@ export function AudioPlayer() {
       </section>
 
       {/* Todo */}
-      {audioSrc ? <Audio isPlaying={isCurrentlyPlaying} src={audioSrc} onPlaybackEnded={() => console.log('track ended')}></Audio> : null}
+      {audioSrc ? <Audio isPlaying={isCurrentlyPlaying} src={audioSrc} onPlaybackEnded={onPlaybackEndedHandler} volume={isMute ? 0: 1}></Audio> : null}
     </>
   );
 }

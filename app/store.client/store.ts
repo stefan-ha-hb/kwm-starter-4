@@ -1,8 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
+import playerReducer from './player-reducer';
 
 export const store = configureStore({
   reducer: {
+    player: playerReducer
     /* TODO add your reducers here */
   },
 });
